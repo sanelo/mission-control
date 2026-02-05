@@ -16,7 +16,7 @@ const COLUMNS = [
     id: 'todo', 
     label: 'To Do', 
     icon: Circle,
-    statuses: ['inbox', 'assigned'],
+    statuses: ['inbox', 'assigned', 'blocked'] as string[],
     color: 'text-slate-400',
     bgColor: 'bg-slate-800/50'
   },
@@ -24,7 +24,7 @@ const COLUMNS = [
     id: 'inprogress', 
     label: 'In Progress', 
     icon: Play,
-    statuses: ['in_progress', 'review'],
+    statuses: ['in_progress', 'review'] as string[],
     color: 'text-cyan-400',
     bgColor: 'bg-cyan-950/30'
   },
@@ -32,11 +32,11 @@ const COLUMNS = [
     id: 'done', 
     label: 'Done', 
     icon: CheckCircle2,
-    statuses: ['done'],
+    statuses: ['done'] as string[],
     color: 'text-emerald-400',
     bgColor: 'bg-emerald-950/30'
   },
-] as const;
+];
 
 const PRIORITY_COLORS = {
   low: 'bg-slate-700 text-slate-300',

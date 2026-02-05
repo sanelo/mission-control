@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { AgentCard } from '@/components/AgentCard';
 import { TaskBoard } from '@/components/TaskBoard';
 import { ActivityFeed } from '@/components/ActivityFeed';
-import { StatsCard } from '@/components/StatsCard';
-import { QuickActions } from '@/components/QuickActions';
+import { QuotaWidget } from '@/components/QuotaWidget';
+import { FilterBar } from '@/components/FilterBar';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { 
@@ -13,183 +14,196 @@ import {
   Activity, 
   AlertCircle,
   CheckCircle2,
-  Clock,
-  Zap
+  Zap,
+  Plus
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TaskForm } from '@/components/TaskForm';
 
 export default function Dashboard() {
+  const [filterAgent, setFilterAgent] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showActivity, setShowActivity] = useState(false);
+  
   const agents = useQuery(api.agents.list) || [];
   const tasks = useQuery(api.tasks.list, {}) || [];
   const activities = useQuery(api.activities.list, { limit: 50 }) || [];
 
+  // Filter tasks
+  const filteredTasks = tasks.filter(task => {
+    const matchesAgent = filterAgent === 'all' || task.assigneeIds.includes(filterAgent);
+    const matchesSearch = !searchQuery || 
+      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      task.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesAgent && matchesSearch;
+  });
+
   const activeAgents = agents.filter(a => a.status === 'active');
-  const idleAgents = agents.filter(a => a.status === 'idle');
   const blockedAgents = agents.filter(a => a.status === 'blocked');
   
-  const openTasks = tasks.filter(t => t.status !== 'done');
-  const inProgressTasks = tasks.filter(t => t.status === 'in_progress');
-  const blockedTasks = tasks.filter(t => t.status === 'blocked');
-  const doneTasks = tasks.filter(t => t.status === 'done');
+  const openTasks = filteredTasks.filter(t => t.status !== 'done' && t.status !== 'blocked');
+  const blockedTasks = filteredTasks.filter(t => t.status === 'blocked');
+  const doneTasks = filteredTasks.filter(t => t.status === 'done');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      {/* Header with Gradient */}
-      <header className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="container mx-auto px-4 py-5">
+    <div className="min-h-screen bg-[#0a0a0f] text-slate-200">
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-[#0f0f14] sticky top-0 z-50">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 flex items-center justify-center text-white text-2xl shadow-lg shadow-orange-500/20">
-                🎯
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
+                ⌘
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Mission Control</h1>
-                <p className="text-sm text-slate-400">
-                  AI Agent Squad Management
-                </p>
+                <h1 className="text-xl font-bold text-white">Mission Control</h1>
+                <p className="text-xs text-slate-500 uppercase tracking-wider">AI Agent Squad</p>
               </div>
             </div>
-            <QuickActions />
+            
+            <div className="flex items-center gap-3">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setShowActivity(!showActivity)}
+                className="text-slate-400 hover:text-white"
+              >
+                <Activity className="h-4 w-4 mr-2" />
+                Activity
+              </Button>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="bg-cyan-600 hover:bg-cyan-500 text-white">
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Task
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900 border-slate-700 text-slate-200">
+                  <DialogHeader>
+                    <DialogTitle>Create New Task</DialogTitle>
+                  </DialogHeader>
+                  <TaskForm agents={agents} />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Stats Overview */}
-      <section className="container mx-auto px-4 -mt-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatsCard
-            title="Active Agents"
-            value={activeAgents.length}
-            total={agents.length}
-            icon={Zap}
-            color="emerald"
-            subtitle={`${idleAgents.length} idle`}
-          />
-          <StatsCard
-            title="Open Tasks"
-            value={openTasks.length}
-            total={tasks.length}
-            icon={LayoutDashboard}
-            color="blue"
-            subtitle={`${inProgressTasks.length} in progress`}
-          />
-          <StatsCard
-            title="Blocked"
-            value={blockedTasks.length + blockedAgents.length}
-            icon={AlertCircle}
-            color="rose"
-            subtitle="Needs attention"
-          />
-          <StatsCard
-            title="Completed"
-            value={doneTasks.length}
-            total={tasks.length}
-            icon={CheckCircle2}
-            color="violet"
-            subtitle="This week"
-          />
-        </div>
-      </section>
-
-      {/* Main Dashboard Content */}
-      <main className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left Sidebar - Agents */}
-          <aside className="lg:col-span-3 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Users className="h-5 w-5 text-slate-500" />
-                Squad
-              </h2>
-              <span className="text-sm text-muted-foreground">
-                {agents.length} agents
+      {/* Blocked Alert */}
+      {(blockedTasks.length > 0 || blockedAgents.length > 0) && (
+        <div className="bg-red-900/20 border-b border-red-800/50">
+          <div className="container mx-auto px-6 py-3">
+            <div className="flex items-center gap-3 text-red-400">
+              <AlertCircle className="h-5 w-5" />
+              <span className="font-medium">
+                {blockedTasks.length} blocked tasks, {blockedAgents.length} blocked agents
               </span>
+              <span className="text-red-400/60 text-sm">— requires attention</span>
             </div>
-            
-            <div className="space-y-3">
-              {agents.length === 0 ? (
-                <div className="text-center py-8 px-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
-                  <Users className="h-8 w-8 mx-auto text-slate-400 mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    No agents yet
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Run the seed script to add agents
-                  </p>
-                </div>
-              ) : (
-                agents.map((agent) => (
-                  <AgentCard key={agent._id} agent={agent} />
-                ))
-              )}
-            </div>
-          </aside>
+          </div>
+        </div>
+      )}
 
-          {/* Center - Task Board */}
-          <section className="lg:col-span-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <LayoutDashboard className="h-5 w-5 text-slate-500" />
-                Task Board
-              </h2>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  {openTasks.length} open
-                </span>
+      <div className="flex">
+        {/* Main Content */}
+        <main className="flex-1 container mx-auto px-6 py-6">
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
+            <div className="lg:col-span-3 grid grid-cols-3 gap-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-500 text-sm">Active Agents</span>
+                  <Zap className="h-4 w-4 text-emerald-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">{activeAgents.length}</div>
+                <div className="text-xs text-slate-500 mt-1">{agents.length} total</div>
+              </div>
+              
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-500 text-sm">Open Tasks</span>
+                  <LayoutDashboard className="h-4 w-4 text-cyan-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">{openTasks.length}</div>
+                <div className="text-xs text-slate-500 mt-1">{tasks.length} total</div>
+              </div>
+              
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-slate-500 text-sm">Completed</span>
+                  <CheckCircle2 className="h-4 w-4 text-violet-400" />
+                </div>
+                <div className="text-2xl font-bold text-white">{doneTasks.length}</div>
+                <div className="text-xs text-slate-500 mt-1">This week</div>
               </div>
             </div>
             
-            {tasks.length === 0 ? (
-              <div className="text-center py-16 px-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
-                <LayoutDashboard className="h-12 w-12 mx-auto text-slate-400 mb-3" />
-                <p className="text-muted-foreground font-medium">
-                  No tasks yet
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Create your first task to get started
+            <QuotaWidget />
+          </div>
+
+          {/* Task Board */}
+          <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <LayoutDashboard className="h-5 w-5 text-cyan-400" />
+                  Task Board
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  {filteredTasks.length} tasks • {openTasks.length} open
                 </p>
               </div>
-            ) : (
-              <TaskBoard tasks={tasks} agents={agents} />
-            )}
+              <FilterBar 
+                agents={agents}
+                filterAgent={filterAgent}
+                setFilterAgent={setFilterAgent}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+              />
+            </div>
+            
+            <TaskBoard tasks={filteredTasks} agents={agents} />
           </section>
 
-          {/* Right Sidebar - Activity */}
-          <aside className="lg:col-span-3 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <Activity className="h-5 w-5 text-slate-500" />
+          {/* Agents Row */}
+          <section className="mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Users className="h-5 w-5 text-violet-400" />
+                Squad
+              </h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {agents.map((agent) => (
+                <AgentCard key={agent._id} agent={agent} compact />
+              ))}
+            </div>
+          </section>
+        </main>
+
+        {/* Activity Sidebar */}
+        {showActivity && (
+          <aside className="w-80 border-l border-slate-800 bg-slate-900 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <Activity className="h-5 w-5 text-emerald-400" />
                 Activity
               </h2>
-              <span className="text-xs text-muted-foreground">
-                Live
-              </span>
+              <span className="text-xs text-emerald-400">Live</span>
             </div>
-            
-            {activities.length === 0 ? (
-              <div className="text-center py-8 px-4 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
-                <Activity className="h-8 w-8 mx-auto text-slate-400 mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  No activity yet
-                </p>
-              </div>
-            ) : (
-              <ActivityFeed activities={activities} agents={agents} />
-            )}
+            <ActivityFeed activities={activities} agents={agents} />
           </aside>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 mt-12 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Mission Control — Built with Next.js + Convex + shadcn/ui</p>
-          <p className="text-xs mt-1 opacity-60">
-            Modernized dashboard v2.0
-          </p>
-        </div>
-      </footer>
+        )}
+      </div>
     </div>
   );
 }
