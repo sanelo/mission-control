@@ -3,12 +3,18 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Agent, AGENT_STATUS_COLORS } from '@/lib/types';
 import { Activity, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Doc } from '../../convex/_generated/dataModel';
 
 interface AgentCardProps {
-  agent: Agent;
+  agent: Doc<"agents">;
 }
+
+const AGENT_STATUS_COLORS = {
+  idle: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  active: 'bg-green-100 text-green-800 border-green-200',
+  blocked: 'bg-red-100 text-red-800 border-red-200',
+};
 
 export function AgentCard({ agent }: AgentCardProps) {
   const statusIcon = {

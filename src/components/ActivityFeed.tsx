@@ -1,7 +1,7 @@
 'use client';
 
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Activity, Agent } from '@/lib/types';
+import { Doc } from '../../convex/_generated/dataModel';
 import { 
   MessageSquare, 
   CheckCircle2, 
@@ -11,18 +11,18 @@ import {
 } from 'lucide-react';
 
 interface ActivityFeedProps {
-  activities: Activity[];
-  agents: Agent[];
+  activities: Doc<"activities">[];
+  agents: Doc<"agents">[];
 }
 
-const activityIcons: Record<Activity['type'], LucideIcon> = {
+const activityIcons: Record<Doc<"activities">["type"], LucideIcon> = {
   task_created: CheckCircle2,
   task_updated: AlertCircle,
   message_sent: MessageSquare,
   agent_status_changed: UserCog,
 };
 
-const activityColors: Record<Activity['type'], string> = {
+const activityColors: Record<Doc<"activities">["type"], string> = {
   task_created: 'text-green-500',
   task_updated: 'text-amber-500',
   message_sent: 'text-blue-500',
@@ -30,7 +30,7 @@ const activityColors: Record<Activity['type'], string> = {
 };
 
 export function ActivityFeed({ activities, agents }: ActivityFeedProps) {
-  const getAgent = (agentId: string) => agents.find((a) => a.id === agentId);
+  const getAgent = (agentId: string) => agents.find((a) => a._id === agentId);
 
   return (
     <ScrollArea className="h-[400px]">
@@ -40,7 +40,7 @@ export function ActivityFeed({ activities, agents }: ActivityFeedProps) {
           const Icon = activityIcons[activity.type];
           
           return (
-            <div key={activity.id} className="flex items-start gap-3 text-sm">
+            <div key={activity._id} className="flex items-start gap-3 text-sm">
               <div className={`mt-0.5 ${activityColors[activity.type]}`}>
                 <Icon className="h-4 w-4" />
               </div>

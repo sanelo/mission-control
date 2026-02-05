@@ -1,22 +1,39 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Task, TaskStatus, TASK_STATUS_COLORS, TASK_STATUS_LABELS } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { Doc } from '../../convex/_generated/dataModel';
 
 interface TaskBoardProps {
-  tasks: Task[];
+  tasks: Doc<"tasks">[];
 }
 
-const columns: TaskStatus[] = ['inbox', 'assigned', 'in_progress', 'review', 'done', 'blocked'];
+const TASK_STATUS_LABELS = {
+  inbox: 'Inbox',
+  assigned: 'Assigned',
+  in_progress: 'In Progress',
+  review: 'Review',
+  done: 'Done',
+  blocked: 'Blocked',
+};
+
+const TASK_STATUS_COLORS = {
+  inbox: 'bg-gray-100 text-gray-800',
+  assigned: 'bg-blue-100 text-blue-800',
+  in_progress: 'bg-amber-100 text-amber-800',
+  review: 'bg-purple-100 text-purple-800',
+  done: 'bg-green-100 text-green-800',
+  blocked: 'bg-red-100 text-red-800',
+};
+
+const columns = ['inbox', 'assigned', 'in_progress', 'review', 'done', 'blocked'] as const;
 
 export function TaskBoard({ tasks }: TaskBoardProps) {
   const tasksByStatus = columns.reduce((acc, status) => {
     acc[status] = tasks.filter((task) => task.status === status);
     return acc;
-  }, {} as Record<TaskStatus, Task[]>);
+  }, {} as Record<typeof columns[number], Doc<"tasks">[]>);
 
   return (
     <div className="grid grid-cols-6 gap-3 h-full">
@@ -31,7 +48,7 @@ export function TaskBoard({ tasks }: TaskBoardProps) {
           <ScrollArea className="flex-1">
             <div className="space-y-2 pr-3">
               {tasksByStatus[status].map((task) => (
-                <TaskCard key={task.id} task={task} />
+                <TaskCard key={task._id} task={task} />
               ))}
             </div>
           </ScrollArea>
@@ -41,7 +58,7 @@ export function TaskBoard({ tasks }: TaskBoardProps) {
   );
 }
 
-function TaskCard({ task }: { task: Task }) {
+function TaskCard({ task }: { task: Doc<"tasks"> }) {
   return (
     <Card className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-transparent hover:border-l-primary">
       <CardContent className="p-3">
@@ -69,11 +86,6 @@ function TaskCard({ task }: { task: Task }) {
             </div>
           )}
         </div>
-        {task.comments.length > 0 && (
-          <div className="mt-2 pt-2 border-t text-[10px] text-muted-foreground">
-            💬 {task.comments.length} comment{task.comments.length > 1 ? 's' : ''}
-          </div>
-        )}
       </CardContent>
     </Card>
   );

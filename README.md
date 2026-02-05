@@ -4,28 +4,70 @@ AI Agent Squad Management Dashboard — inspired by pbteja1998's multi-agent sys
 
 ## Features
 
-- **Agent Management**: View all AI agents with their status, roles, and session keys
+- **Agent Management**: View all AI agents with real-time status, roles, and session keys
 - **Task Board**: Kanban-style board with columns for Inbox → Assigned → In Progress → Review → Done → Blocked
 - **Activity Feed**: Real-time activity stream showing agent actions and status changes
-- **Cost Optimized**: Designed for use with cheap models for heartbeats, expensive models for creative work
+- **Real-Time**: Powered by Convex for live updates
+- **OpenClaw Integration**: Agents can report status, create tasks, and post comments via webhooks
 
 ## Tech Stack
 
 - **Framework**: Next.js 16 + React 19 + TypeScript
 - **Styling**: Tailwind CSS + shadcn/ui
+- **Database**: Convex (real-time)
 - **Icons**: Lucide React
 
-## Getting Started
+## Quick Start
+
+### 1. Clone and Install
 
 ```bash
-# Install dependencies
+git clone https://github.com/sanelo/mission-control.git
+cd mission-control
 npm install
+```
 
-# Run development server
+### 2. Setup Convex
+
+```bash
+npx convex dev --once --configure=new
+```
+
+Copy the deployment URL from the output.
+
+### 3. Configure Environment
+
+```bash
+cp .env.local.example .env.local
+# Add your Convex URL:
+# NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
+```
+
+### 4. Seed Database
+
+Open the Convex dashboard and run the seed mutations (see OPENCLAW_INTEGRATION.md).
+
+### 5. Run Development
+
+```bash
 npm run dev
+```
 
-# Build for production
-npm run build
+## OpenClaw Integration
+
+See [OPENCLAW_INTEGRATION.md](./OPENCLAW_INTEGRATION.md) for full setup instructions.
+
+Quick example:
+
+```bash
+# Agent reports status
+curl -X POST "$CONVEX_URL/api/openclaw/agentHeartbeat" \
+  -H "Authorization: Bearer $SECRET" \
+  -d '{
+    "sessionKey": "agent:developer:main",
+    "status": "active",
+    "message": "Working on dashboard"
+  }'
 ```
 
 ## Agent Roles
@@ -41,20 +83,31 @@ npm run build
 
 ## Architecture
 
-This dashboard is the frontend for a multi-agent system where:
-- Each agent runs as an isolated OpenClaw session
-- Agents communicate via shared workspace files
-- Heartbeat system wakes agents every 15-30 minutes
-- Tasks flow through a kanban board
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│ OpenClaw    │────▶│  Convex     │◀────│  Dashboard  │
+│  Agents     │     │  Database   │     │  (Next.js)  │
+└─────────────┘     └─────────────┘     └─────────────┘
+```
+
+- Agents report via HTTP webhooks
+- Convex provides real-time sync
+- Dashboard shows live data
+
+## Cost Optimization
+
+- **Heartbeats**: Use cheap models (Gemini Flash ~$0.50/M tokens)
+- **Task creation**: Cheap models work fine  
+- **Content generation**: Use expensive models (GPT-5.2, Claude Opus)
 
 ## Future Enhancements
 
-- [ ] Convex database integration for real-time updates
-- [ ] WebSocket connection to OpenClaw gateway
 - [ ] Agent chat/messaging interface
 - [ ] Document storage and management
 - [ ] Daily standup generation
 - [ ] Cost tracking per agent
+- [ ] Task assignment UI
+- [ ] Notification system
 
 ## Credits
 

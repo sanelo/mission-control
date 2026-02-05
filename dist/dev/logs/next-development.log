@@ -1,0 +1,116 @@
+[00:00:00.941] Server  LOG     
+[00:00:00.941] Server  LOG       We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+[00:00:00.942] Server  LOG       The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+[00:00:00.942] Server  LOG       	- include was updated to add 'dist/types/**/*.ts'
+[00:00:00.942] Server  LOG       	- include was updated to add 'dist/dev/types/**/*.ts'
+[00:00:00.942] Server  LOG     
+[00:00:01.023] Server  LOG     ✓ Ready in 724ms
+[00:00:07.992] Server  ERROR   ⨯ ./src/app/page.tsx:8:1
+Module not found: Can't resolve '../../convex/_generated/api'
+   6 | import { ActivityFeed } from '@/components/ActivityFeed';
+   7 | import { useQuery } from 'convex/react';
+>  8 | import { api } from '../../convex/_generated/api';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import { Activity, Users, LayoutDashboard } from 'lucide-react';
+  10 |
+  11 | export default function Dashboard() {
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:08.928] Browser ERROR   uncaughtError: Error: ./src/app/page.tsx:8:1
+Module not found: Can't resolve '../../convex/_generated/api'
+   6 | import { ActivityFeed } from '@/components/ActivityFeed';
+   7 | import { useQuery } from 'convex/react';
+>  8 | import { api } from '../../convex/_generated/api';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import { Activity, Users, LayoutDashboard } from 'lucide-react';
+  10 |
+  11 | export default function Dashboard() {
+
+
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+[00:00:09.305] Browser ERROR   ./src/app/page.tsx:8:1
+Module not found: Can't resolve '../../convex/_generated/api'
+   6 | import { ActivityFeed } from '@/components/ActivityFeed';
+   7 | import { useQuery } from 'convex/react';
+>  8 | import { api } from '../../convex/_generated/api';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import { Activity, Users, LayoutDashboard } from 'lucide-react';
+  10 |
+  11 | export default function Dashboard() {
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[00:00:09.305] Browser ERROR   ./src/app/page.tsx:8:1
+Module not found: Can't resolve '../../convex/_generated/api'
+   6 | import { ActivityFeed } from '@/components/ActivityFeed';
+   7 | import { useQuery } from 'convex/react';
+>  8 | import { api } from '../../convex/_generated/api';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import { Activity, Users, LayoutDashboard } from 'lucide-react';
+  10 |
+  11 | export default function Dashboard() {
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+[00:00:09.305] Browser ERROR   ./src/app/page.tsx:8:1
+Module not found: Can't resolve '../../convex/_generated/api'
+   6 | import { ActivityFeed } from '@/components/ActivityFeed';
+   7 | import { useQuery } from 'convex/react';
+>  8 | import { api } from '../../convex/_generated/api';
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import { Activity, Users, LayoutDashboard } from 'lucide-react';
+  10 |
+  11 | export default function Dashboard() {
+
+Import traces:
+  Client Component Browser:
+    ./src/app/page.tsx [Client Component Browser]
+    ./src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/page.tsx [Client Component SSR]
+    ./src/app/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
