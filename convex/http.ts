@@ -1,6 +1,7 @@
 // HTTP actions for external integration (OpenClaw)
 import { httpRouter } from "convex/server";
-import { v } from "convex/values";
+import { httpAction } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 const http = httpRouter();
 
@@ -8,7 +9,7 @@ const http = httpRouter();
 http.route({
   path: "/webhook",
   method: "POST",
-  handler: async (ctx, request) => {
+  handler: httpAction(async (ctx, request) => {
     // Simple auth check - in production use proper API keys
     const authHeader = request.headers.get("authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -21,10 +22,7 @@ http.route({
     switch (action) {
       case "heartbeat": {
         // Find agent by session key
-        const agent = await ctx.db
-          .query("agents")
-          .withIndex("by_session_key", (q) => q.eq("sessionKey", sessionKey))
-          .first();
+        const agent = await ctx.runQuery(internal.agents.getBySessionKey, { sessionKey });
         
         if (!agent) {
           return new Response(JSON.stringify({ error: "Agent not found" }), { 
@@ -33,8 +31,10 @@ http.route({
           });
         }
 
-        await ctx.db.patch(agent._id, {
-          lastHeartbeat: new Date().toISOString(),
+        // Update heartbeat
+        await ctx.runMutation(internal.agents.updateStatus, { 
+          id: agent._id,
+          status: agent.status,
         });
 
         return new Response(JSON.stringify({ success: true, agentId: agent._id }), {
@@ -44,14 +44,10 @@ http.route({
       }
 
       case "task.create": {
-        const now = new Date().toISOString();
-        const taskId = await ctx.db.insert("tasks", {
+        const taskId = await ctx.runMutation(internal.tasks.createInternal, {
           title: payload.title,
           description: payload.description,
-          status: payload.assigneeIds ? "assigned" : "inbox",
           assigneeIds: payload.assigneeIds || [],
-          createdAt: now,
-          updatedAt: now,
         });
         
         return new Response(JSON.stringify({ success: true, taskId }), {
@@ -61,9 +57,10 @@ http.route({
       }
 
       case "task.update": {
-        await ctx.db.patch(payload.taskId, {
+        await ctx.runMutation(internal.tasks.updateStatusInternal, {
+          id: payload.taskId,
           status: payload.status,
-          updatedAt: new Date().toISOString(),
+          agentId: payload.agentId,
         });
         
         return new Response(JSON.stringify({ success: true }), {
@@ -73,11 +70,10 @@ http.route({
       }
 
       case "message.create": {
-        const messageId = await ctx.db.insert("messages", {
+        const messageId = await ctx.runMutation(internal.messages.createInternal, {
           taskId: payload.taskId,
           fromAgentId: payload.agentId,
           content: payload.content,
-          createdAt: new Date().toISOString(),
         });
         
         return new Response(JSON.stringify({ success: true, messageId }), {
@@ -92,19 +88,19 @@ http.route({
           headers: { "Content-Type": "application/json" },
         });
     }
-  },
+  }),
 });
 
 // Health check endpoint
 http.route({
   path: "/health",
   method: "GET",
-  handler: async () => {
+  handler: httpAction(async () => {
     return new Response(JSON.stringify({ status: "ok", service: "mission-control" }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  },
+  }),
 });
 
 export default http;

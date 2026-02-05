@@ -1,6 +1,6 @@
 // Agent CRUD operations
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalQuery, internalMutation } from "./_generated/server";
 
 // Get all agents
 export const list = query({
@@ -17,8 +17,8 @@ export const get = query({
   },
 });
 
-// Get agent by session key
-export const getBySessionKey = query({
+// Get agent by session key (internal)
+export const getBySessionKey = internalQuery({
   args: { sessionKey: v.string() },
   handler: async (ctx, { sessionKey }) => {
     return await ctx.db

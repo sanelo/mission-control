@@ -1,6 +1,6 @@
 // Task CRUD operations
 import { v } from "convex/values";
-import { query, mutation } from "./_generated/server";
+import { query, mutation, internalQuery, internalMutation } from "./_generated/server";
 
 // Get all tasks with optional status filter
 export const list = query({
@@ -63,7 +63,7 @@ export const create = mutation({
     // Create activity
     await ctx.db.insert("activities", {
       type: "task_created",
-      agentId: assigneeIds?.[0] || "jarvis", // Default to jarvis if no assignee
+      agentId: assigneeIds?.[0] ?? (await ctx.db.query("agents").first())?._id ?? "jarvis" as any,
       message: `Created task: ${title}`,
       timestamp: now,
     });
@@ -123,6 +123,67 @@ export const assign = mutation({
       type: "task_updated",
       agentId,
       message: `Task assigned to ${assigneeIds.length} agent(s)`,
+      timestamp: new Date().toISOString(),
+    });
+
+    return await ctx.db.get(id);
+  },
+});
+
+// Internal mutations for HTTP actions
+export const createInternal = internalMutation({
+  args: {
+    title: v.string(),
+    description: v.string(),
+    assigneeIds: v.optional(v.array(v.id("agents"))),
+  },
+  handler: async (ctx, { title, description, assigneeIds }) => {
+    const now = new Date().toISOString();
+    const taskId = await ctx.db.insert("tasks", {
+      title,
+      description,
+      status: assigneeIds && assigneeIds.length > 0 ? "assigned" : "inbox",
+      assigneeIds: assigneeIds || [],
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    // Create activity
+    await ctx.db.insert("activities", {
+      type: "task_created",
+      agentId: assigneeIds?.[0] ?? (await ctx.db.query("agents").first())?._id ?? "jarvis" as any,
+      message: `Created task: ${title}`,
+      timestamp: now,
+    });
+
+    return taskId;
+  },
+});
+
+export const updateStatusInternal = internalMutation({
+  args: {
+    id: v.id("tasks"),
+    status: v.union(
+      v.literal("inbox"),
+      v.literal("assigned"),
+      v.literal("in_progress"),
+      v.literal("review"),
+      v.literal("done"),
+      v.literal("blocked")
+    ),
+    agentId: v.id("agents"),
+  },
+  handler: async (ctx, { id, status, agentId }) => {
+    await ctx.db.patch(id, {
+      status,
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Create activity
+    await ctx.db.insert("activities", {
+      type: "task_updated",
+      agentId,
+      message: `Task status changed to ${status}`,
       timestamp: new Date().toISOString(),
     });
 

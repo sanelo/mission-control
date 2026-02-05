@@ -4,89 +4,159 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Doc } from '../../convex/_generated/dataModel';
+import { Circle, Play, CheckCircle2, AlertCircle } from 'lucide-react';
 
 interface TaskBoardProps {
-  tasks: Doc<"tasks">[];
+  tasks: Doc<'tasks'>[];
+  agents: Doc<'agents'>[];
 }
 
-const TASK_STATUS_LABELS = {
-  inbox: 'Inbox',
-  assigned: 'Assigned',
-  in_progress: 'In Progress',
-  review: 'Review',
-  done: 'Done',
-  blocked: 'Blocked',
+const COLUMNS = [
+  { 
+    id: 'todo', 
+    label: 'To Do', 
+    icon: Circle,
+    statuses: ['inbox', 'assigned'],
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-800/50'
+  },
+  { 
+    id: 'inprogress', 
+    label: 'In Progress', 
+    icon: Play,
+    statuses: ['in_progress', 'review'],
+    color: 'text-cyan-400',
+    bgColor: 'bg-cyan-950/30'
+  },
+  { 
+    id: 'done', 
+    label: 'Done', 
+    icon: CheckCircle2,
+    statuses: ['done'],
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-950/30'
+  },
+] as const;
+
+const PRIORITY_COLORS = {
+  low: 'bg-slate-700 text-slate-300',
+  medium: 'bg-blue-900/50 text-blue-300',
+  high: 'bg-amber-900/50 text-amber-300',
+  urgent: 'bg-red-900/50 text-red-300',
 };
 
-const TASK_STATUS_COLORS = {
-  inbox: 'bg-gray-100 text-gray-800',
-  assigned: 'bg-blue-100 text-blue-800',
-  in_progress: 'bg-amber-100 text-amber-800',
-  review: 'bg-purple-100 text-purple-800',
-  done: 'bg-green-100 text-green-800',
-  blocked: 'bg-red-100 text-red-800',
-};
+export function TaskBoard({ tasks, agents }: TaskBoardProps) {
+  const getAgentName = (agentId: string) => {
+    const agent = agents.find(a => a._id === agentId);
+    return agent?.name || agentId.slice(0, 6);
+  };
 
-const columns = ['inbox', 'assigned', 'in_progress', 'review', 'done', 'blocked'] as const;
-
-export function TaskBoard({ tasks }: TaskBoardProps) {
-  const tasksByStatus = columns.reduce((acc, status) => {
-    acc[status] = tasks.filter((task) => task.status === status);
-    return acc;
-  }, {} as Record<typeof columns[number], Doc<"tasks">[]>);
+  const getAgentColor = (agentId: string) => {
+    const agent = agents.find(a => a._id === agentId);
+    return agent?.color || 'bg-slate-600';
+  };
 
   return (
-    <div className="grid grid-cols-6 gap-3 h-full">
-      {columns.map((status) => (
-        <div key={status} className="flex flex-col min-w-[180px]">
-          <div className="flex items-center justify-between mb-2 px-1">
-            <h3 className="text-sm font-medium">{TASK_STATUS_LABELS[status]}</h3>
-            <Badge variant="secondary" className="text-xs">
-              {tasksByStatus[status].length}
-            </Badge>
+    <div className="grid grid-cols-3 gap-4">
+      {COLUMNS.map((column) => {
+        const columnTasks = tasks.filter((task) =>
+          column.statuses.includes(task.status)
+        );
+        const Icon = column.icon;
+
+        return (
+          <div key={column.id} className="flex flex-col">
+            {/* Column Header */}
+            <div className={`flex items-center justify-between mb-3 px-3 py-2 rounded-lg ${column.bgColor}`}>
+              <div className="flex items-center gap-2">
+                <Icon className={`h-4 w-4 ${column.color}`} />
+                <span className="text-sm font-semibold text-slate-200">
+                  {column.label}
+                </span>
+              </div>
+              <Badge variant="secondary" className="bg-slate-800 text-slate-400">
+                {columnTasks.length}
+              </Badge>
+            </div>
+
+            {/* Tasks */}
+            <ScrollArea className="h-[500px]">
+              <div className="space-y-3 pr-3">
+                {columnTasks.map((task) => (
+                  <Card 
+                    key={task._id} 
+                    className="bg-slate-900/80 border-slate-800 hover:border-cyan-500/30 transition-all cursor-pointer group"
+                  >
+                    <CardContent className="p-4">
+                      {/* Priority Badge */}
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-[10px] ${PRIORITY_COLORS[task.priority || 'medium']}`}
+                        >
+                          {task.priority || 'medium'}
+                        </Badge>
+                        
+                        {task.status === 'blocked' && (
+                          <AlertCircle className="h-4 w-4 text-red-400" />
+                        )}
+                      </div>
+
+                      {/* Title */}
+                      <h4 className="text-sm font-medium text-slate-200 mb-2 line-clamp-2 group-hover:text-cyan-400 transition-colors">
+                        {task.title}
+                      </h4>
+
+                      {/* Description */}
+                      {task.description && (
+                        <p className="text-xs text-slate-500 mb-3 line-clamp-2">
+                          {task.description}
+                        </p>
+                      )}
+
+                      {/* Footer: Status + Assignees */}
+                      <div className="flex items-center justify-between">
+                        <Badge 
+                          variant="outline" 
+                          className="text-[10px] border-slate-700 text-slate-500"
+                        >
+                          {task.status.replace('_', ' ')}
+                        </Badge>
+
+                        {task.assigneeIds.length > 0 && (
+                          <div className="flex -space-x-1.5">
+                            {task.assigneeIds.slice(0, 3).map((agentId) => (
+                              <div
+                                key={agentId}
+                                className={`h-6 w-6 rounded-full ${getAgentColor(agentId)} text-[9px] flex items-center justify-center text-white border-2 border-slate-900 font-medium`}
+                                title={getAgentName(agentId)}
+                              >
+                                {getAgentName(agentId).slice(0, 2).toUpperCase()}
+                              </div>
+                            ))}
+                            {task.assigneeIds.length > 3 && (
+                              <div className="h-6 w-6 rounded-full bg-slate-700 text-[9px] flex items-center justify-center text-slate-300 border-2 border-slate-900">
+                                +{task.assigneeIds.length - 3}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+
+                {columnTasks.length === 0 && (
+                  <div className="text-center py-8 text-slate-600">
+                    <Icon className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No tasks</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </div>
-          <ScrollArea className="flex-1">
-            <div className="space-y-2 pr-3">
-              {tasksByStatus[status].map((task) => (
-                <TaskCard key={task._id} task={task} />
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
-      ))}
+        );
+      })}
     </div>
-  );
-}
-
-function TaskCard({ task }: { task: Doc<"tasks"> }) {
-  return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-transparent hover:border-l-primary">
-      <CardContent className="p-3">
-        <h4 className="text-sm font-medium mb-2 line-clamp-2">{task.title}</h4>
-        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-          {task.description}
-        </p>
-        <div className="flex items-center justify-between">
-          <Badge 
-            variant="secondary" 
-            className={`text-[10px] ${TASK_STATUS_COLORS[task.status]}`}
-          >
-            {TASK_STATUS_LABELS[task.status]}
-          </Badge>
-          {task.assigneeIds.length > 0 && (
-            <div className="flex -space-x-1">
-              {task.assigneeIds.map((agentId) => (
-                <div
-                  key={agentId}
-                  className="h-5 w-5 rounded-full bg-primary text-[8px] flex items-center justify-center text-primary-foreground border-2 border-background"
-                >
-                  {agentId.slice(0, 2).toUpperCase()}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
   );
 }

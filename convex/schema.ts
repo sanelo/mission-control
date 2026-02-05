@@ -28,6 +28,12 @@ export default defineSchema({
       v.literal("done"),
       v.literal("blocked")
     ),
+    priority: v.optional(v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+      v.literal("urgent")
+    )),
     assigneeIds: v.array(v.id("agents")),
     createdAt: v.string(),
     updatedAt: v.string(),

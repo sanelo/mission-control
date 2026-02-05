@@ -3,10 +3,10 @@
 
 import { v } from "convex/values";
 import { action } from "./_generated/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 // Action to handle agent heartbeat and sync status
-export const agentHeartbeat = action({
+export const agentHeartbeat: any = action({
   args: {
     sessionKey: v.string(),
     status: v.union(v.literal("idle"), v.literal("active"), v.literal("blocked")),
@@ -14,7 +14,7 @@ export const agentHeartbeat = action({
   },
   handler: async (ctx, { sessionKey, status, message }) => {
     // Find or create agent
-    let agent = await ctx.runQuery(api.agents.getBySessionKey, { sessionKey });
+    let agent = await ctx.runQuery(internal.agents.getBySessionKey, { sessionKey });
     
     if (!agent) {
       // Auto-create agent if it doesn't exist
@@ -41,8 +41,7 @@ export const agentHeartbeat = action({
 
     // If message provided, create activity
     if (message) {
-      await ctx.runMutation(api.internal.activities.create, {
-        type: "agent_status_changed",
+      await ctx.runMutation(internal.activities.create, {
         agentId: agent._id,
         message,
       });
@@ -53,20 +52,20 @@ export const agentHeartbeat = action({
 });
 
 // Action to create a task from an agent
-export const createTask = action({
+export const createTask: any = action({
   args: {
     sessionKey: v.string(),
     title: v.string(),
     description: v.string(),
   },
   handler: async (ctx, { sessionKey, title, description }) => {
-    const agent = await ctx.runQuery(api.agents.getBySessionKey, { sessionKey });
+    const agent = await ctx.runQuery(internal.agents.getBySessionKey, { sessionKey });
     
     if (!agent) {
       throw new Error(`Agent not found: ${sessionKey}`);
     }
 
-    const taskId = await ctx.runMutation(api.tasks.create, {
+    const taskId = await ctx.runMutation(internal.tasks.createInternal, {
       title,
       description,
       assigneeIds: [],
@@ -77,20 +76,20 @@ export const createTask = action({
 });
 
 // Action to post a message/comment
-export const postMessage = action({
+export const postMessage: any = action({
   args: {
     sessionKey: v.string(),
     taskId: v.id("tasks"),
     content: v.string(),
   },
   handler: async (ctx, { sessionKey, taskId, content }) => {
-    const agent = await ctx.runQuery(api.agents.getBySessionKey, { sessionKey });
+    const agent = await ctx.runQuery(internal.agents.getBySessionKey, { sessionKey });
     
     if (!agent) {
       throw new Error(`Agent not found: ${sessionKey}`);
     }
 
-    const messageId = await ctx.runMutation(api.messages.create, {
+    const messageId = await ctx.runMutation(internal.messages.createInternal, {
       taskId,
       fromAgentId: agent._id,
       content,
