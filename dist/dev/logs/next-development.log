@@ -35334,3 +35334,132 @@ Import trace:
   Client Component Browser:
     ./src/app/globals.css [Client Component Browser]
     ./src/app/layout.tsx [Server Component]
+[03:27:32.819] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:27:32.820] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:27:38.887] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:27:38.888] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:28:00.344] Server  LOG     ✓ Compiled in 57ms
+[03:28:00.449] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:28:00.449] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:28:18.122] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[03:28:18.122] Browser ERROR   ./src/app/globals.css:2843:14
+Parsing CSS source code failed
+  2841 |   }
+  2842 |   .data-\[��\16 \=�\%�\]\:flex-col {
+> 2843 |     &[data-� ="�%�"] {
+       |              ^
+  2844 |       flex-direction: column;
+  2845 |     }
+  2846 |   }
+
+Unexpected token in attribute selector: Delim('\u{16}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]

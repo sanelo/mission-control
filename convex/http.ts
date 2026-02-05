@@ -1,7 +1,7 @@
 // HTTP actions for external integration (OpenClaw)
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 const http = httpRouter();
 
@@ -32,7 +32,7 @@ http.route({
         }
 
         // Update heartbeat
-        await ctx.runMutation(internal.agents.updateStatus, { 
+        await ctx.runMutation(api.agents.updateStatus, { 
           id: agent._id,
           status: agent.status,
         });

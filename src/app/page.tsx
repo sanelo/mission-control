@@ -151,7 +151,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <TaskBoard tasks={tasks} />
+              <TaskBoard tasks={tasks} agents={agents} />
             )}
           </section>
 
