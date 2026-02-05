@@ -1,8 +1,8 @@
 // Seed script for Convex database
-// Run with: npx tsx convex/seed.ts
+// Run with: npx convex run seed:run
 
-import { api } from "./_generated/api";
-import { useConvex, useMutation } from "convex/react";
+import { v } from "convex/values";
+import { internalMutation } from "./_generated/server";
 
 const INITIAL_AGENTS = [
   {
@@ -70,5 +70,61 @@ const INITIAL_TASKS = [
   },
 ];
 
-// This would be run as a one-time setup script
-// For now, we'll create a Convex mutation that can be called
+// Internal mutation to seed the database
+export const run = internalMutation({
+  handler: async (ctx) => {
+    const results = {
+      agents: { created: 0, skipped: 0 },
+      tasks: { created: 0, skipped: 0 },
+    };
+
+    // Seed agents (idempotent - check by sessionKey)
+    for (const agentData of INITIAL_AGENTS) {
+      const existing = await ctx.db
+        .query("agents")
+        .withIndex("by_session_key", (q) =>
+          q.eq("sessionKey", agentData.sessionKey)
+        )
+        .first();
+
+      if (!existing) {
+        await ctx.db.insert("agents", {
+          ...agentData,
+          status: agentData.name === 'Jarvis' ? 'active' : 'idle',
+          lastHeartbeat: new Date().toISOString(),
+        });
+        results.agents.created++;
+        console.log(`Created agent: ${agentData.name}`);
+      } else {
+        results.agents.skipped++;
+        console.log(`Skipped agent (exists): ${agentData.name}`);
+      }
+    }
+
+    // Seed tasks (idempotent - check by title)
+    for (const taskData of INITIAL_TASKS) {
+      const existing = await ctx.db
+        .query("tasks")
+        .filter((q) => q.eq(q.field("title"), taskData.title))
+        .first();
+
+      if (!existing) {
+        const now = new Date().toISOString();
+        await ctx.db.insert("tasks", {
+          ...taskData,
+          status: 'inbox',
+          assigneeIds: [],
+          createdAt: now,
+          updatedAt: now,
+        });
+        results.tasks.created++;
+        console.log(`Created task: ${taskData.title}`);
+      } else {
+        results.tasks.skipped++;
+        console.log(`Skipped task (exists): ${taskData.title}`);
+      }
+    }
+
+    return results;
+  },
+});
