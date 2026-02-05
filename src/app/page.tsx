@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   // Filter tasks
   const filteredTasks = tasks.filter(task => {
-    const matchesAgent = filterAgent === 'all' || task.assigneeIds.includes(filterAgent);
+    const matchesAgent = filterAgent === 'all' || task.assigneeIds.includes(filterAgent as any);
     const matchesSearch = !searchQuery || 
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.description?.toLowerCase().includes(searchQuery.toLowerCase());

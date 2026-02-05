@@ -26,7 +26,7 @@ export function TaskForm({ agents }: TaskFormProps) {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('inbox');
   const [priority, setPriority] = useState('medium');
-  const [assigneeIds, setAssigneeIds] = useState<string[]>([]);
+  const [assigneeIds, setAssigneeIds] = useState<any[]>([]);
   
   const createTask = useMutation(api.tasks.create);
 
@@ -37,7 +37,7 @@ export function TaskForm({ agents }: TaskFormProps) {
       description,
       status: status as any,
       priority: priority as any,
-      assigneeIds,
+      assigneeIds: assigneeIds as any,
     });
     // Reset form
     setTitle('');
