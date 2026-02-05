@@ -1,0 +1,55 @@
+[00:00:00.959] Server  LOG     ✓ Ready in 661ms
+[00:00:20.500] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:00:20.500] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:01:21.573] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:01:21.573] Browser WARN    Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+[00:16:19.020] Server  LOG     ✓ Compiled in 402ms
+[00:16:19.496] Browser ERROR   ./src/app/globals.css:688:20
+Parsing CSS source code failed
+  686 |   }
+  687 |   .h-\[var\(--�\b \3 Y\6 \3 �\8 �\1 -height\)\] {
+> 688 |     height: var(--�Y��-height);
+      |                    ^
+  689 |   }
+  690 |   .h-full {
+  691 |     height: 100%;
+
+Unexpected token Delim('\u{b}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:17:21.620] Server  LOG     ✓ Compiled in 115ms
+[00:17:22.496] Browser ERROR   ./src/app/globals.css:696:20
+Parsing CSS source code failed
+  694 |   }
+  695 |   .h-\[var\(--�\b \3 Y\6 \3 �\8 �\1 -height\)\] {
+> 696 |     height: var(--�Y��-height);
+      |                    ^
+  697 |   }
+  698 |   .h-full {
+  699 |     height: 100%;
+
+Unexpected token Delim('\u{b}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
+[00:17:48.508] Browser ERROR   ./src/app/globals.css:696:20
+Parsing CSS source code failed
+  694 |   }
+  695 |   .h-\[var\(--�\b \3 Y\6 \3 �\8 �\1 -height\)\] {
+> 696 |     height: var(--�Y��-height);
+      |                    ^
+  697 |   }
+  698 |   .h-full {
+  699 |     height: 100%;
+
+Unexpected token Delim('\u{b}')
+
+Import trace:
+  Client Component Browser:
+    ./src/app/globals.css [Client Component Browser]
+    ./src/app/layout.tsx [Server Component]
